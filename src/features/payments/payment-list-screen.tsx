@@ -2,9 +2,11 @@ import { useState, useCallback } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { Card, Text, Chip, Button, FAB, ActivityIndicator, Snackbar } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { fetchPayments, markPaymentAsPaid } from "./payment.queries";
 import { Payment } from "./payment.types";
+
+type Nav = NavigationProp<Record<string, object | undefined>>;
 
 const FILTERS = ["all", "pending", "paid"];
 
@@ -13,7 +15,7 @@ export default function PaymentListScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<Nav>();
 
   useFocusEffect(
     useCallback(() => {

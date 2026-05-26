@@ -69,7 +69,7 @@ export default function AppNavigator() {
               Policies: "file-document",
               Payments: "currency-usd",
             };
-            return <MaterialCommunityIcons name={icons[route.name]} size={size} color={color} />;
+            return <MaterialCommunityIcons name={icons[route.name] as keyof typeof MaterialCommunityIcons.glyphMap} size={size} color={color} />;
           },
           headerShown: false,
         })}

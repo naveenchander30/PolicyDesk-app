@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { TextInput, Button, Text, Switch, Snackbar, Menu } from "react-native-paper";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { createPayment } from "./payment.queries";
 import { fetchPolicies } from "@/features/policies/policy.queries";
 import { PolicyWithDetails } from "@/features/policies/policy.types";
+
+type Nav = NavigationProp<Record<string, { policyId?: string }>>;
+type PayRoute = RouteProp<Record<string, { policyId?: string }>>;
 
 export default function PaymentFormScreen() {
   const [policyId, setPolicyId] = useState("");
@@ -16,9 +19,9 @@ export default function PaymentFormScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPolicyMenu, setShowPolicyMenu] = useState(false);
-  const navigation = useNavigation<any>();
-  const route = useRoute();
-  const prefillPolicyId = (route.params as { policyId?: string })?.policyId;
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<PayRoute>();
+  const prefillPolicyId = route.params?.policyId;
 
   useEffect(() => {
     fetchPolicies().then(setPolicies);

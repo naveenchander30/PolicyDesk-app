@@ -12,13 +12,10 @@ jest.mock("@/lib/supabase", () => ({
   }),
 }));
 
-jest.mock("@/navigation/app-navigator", () => {
-  const { View, Text } = require("react-native");
-  return {
-    __esModule: true,
-    default: () => <View><Text>AppNavigator</Text></View>,
-  };
-});
+jest.mock("@/navigation/app-navigator", () => ({
+  __esModule: true,
+  default: () => null,
+}));
 
 describe("AuthGate", () => {
   it("renders auth when signed out", async () => {

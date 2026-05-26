@@ -7,7 +7,7 @@ jest.mock("@/lib/supabase", () => ({
       select: () => ({
         order: () => Promise.resolve({ data: [], error: null }),
         eq: () => ({
-          then: (resolve: any) => resolve({ data: [], error: null }),
+          then: (resolve: (value: unknown) => void) => resolve({ data: [], error: null }),
         }),
       }),
       insert: () => ({
@@ -26,18 +26,22 @@ jest.mock("@/lib/supabase", () => ({
   }),
 }));
 
-jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
-  useRoute: () => ({ params: {} }),
-  useFocusEffect: jest.fn(),
-}));
+jest.mock("@react-navigation/native", () => {
+  const actual = jest.requireActual("@react-navigation/native");
+  return {
+    ...actual,
+    useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
+    useRoute: () => ({ params: {} }),
+    useFocusEffect: jest.fn(),
+  };
+});
 
 jest.mock("@/features/policies/policy.queries", () => ({
   fetchPolicies: () => Promise.resolve([{ id: "1", clients: { name: "Test" }, premium: 100 }]),
 }));
 
 jest.mock("react-native-safe-area-context", () => ({
-  SafeAreaProvider: ({ children }: any) => children,
+  SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
   useSafeAreaInsets: () => ({ top: 0, right: 0, bottom: 0, left: 0 }),
 }));
 

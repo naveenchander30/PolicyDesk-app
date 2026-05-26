@@ -1,20 +1,23 @@
 import { useState, useCallback } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { Card, Text, Button, List, ActivityIndicator } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { fetchClient } from "./client.queries";
 import { fetchPolicies } from "@/features/policies/policy.queries";
 import { Client } from "./client.types";
 import { PolicyWithDetails } from "@/features/policies/policy.types";
 
+type Nav = NavigationProp<Record<string, object | undefined>>;
+type ClientRoute = RouteProp<Record<string, { id: string }>>;
+
 export default function ClientDetailScreen() {
   const [client, setClient] = useState<Client | null>(null);
   const [policies, setPolicies] = useState<PolicyWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation<any>();
-  const route = useRoute();
-  const { id } = route.params as { id: string };
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<ClientRoute>();
+  const { id } = route.params;
 
   useFocusEffect(
     useCallback(() => {

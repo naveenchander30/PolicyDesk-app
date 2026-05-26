@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import { TextInput, Button, Text, Snackbar, Menu, Divider } from "react-native-paper";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { ScrollView, StyleSheet } from "react-native";
+import { TextInput, Button, Text, Snackbar, Menu } from "react-native-paper";
+import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { createPolicy, updatePolicy, fetchPolicy } from "./policy.queries";
 import { fetchClients } from "@/features/clients/client.queries";
 import { fetchInsuranceTypes } from "@/features/insurance-types/insurance-type.queries";
 import { Client } from "@/features/clients/client.types";
 import { InsuranceType } from "@/features/insurance-types/insurance-type.types";
+
+type Nav = NavigationProp<Record<string, { id?: string; clientId?: string }>>;
+type PolRoute = RouteProp<Record<string, { id?: string; clientId?: string }>>;
 
 export default function PolicyFormScreen() {
   const [clientId, setClientId] = useState("");
@@ -14,7 +17,6 @@ export default function PolicyFormScreen() {
   const [premium, setPremium] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState("active");
   const [notes, setNotes] = useState("");
   const [clients, setClients] = useState<Client[]>([]);
   const [insuranceTypes, setInsuranceTypes] = useState<InsuranceType[]>([]);
@@ -22,10 +24,10 @@ export default function PolicyFormScreen() {
   const [error, setError] = useState<string | null>(null);
   const [showClientMenu, setShowClientMenu] = useState(false);
   const [showTypeMenu, setShowTypeMenu] = useState(false);
-  const navigation = useNavigation<any>();
-  const route = useRoute();
-  const editId = (route.params as { id?: string })?.id;
-  const prefillClientId = (route.params as { clientId?: string })?.clientId;
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<PolRoute>();
+  const editId = route.params?.id;
+  const prefillClientId = route.params?.clientId;
   const isEdit = !!editId;
 
   useEffect(() => {
@@ -44,7 +46,6 @@ export default function PolicyFormScreen() {
       setPremium(String(policy.premium));
       setStartDate(policy.start_date);
       setEndDate(policy.end_date || "");
-      setStatus(policy.status);
       setNotes(policy.notes || "");
     }
   }

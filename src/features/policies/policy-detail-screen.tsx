@@ -1,21 +1,24 @@
 import { useState, useCallback } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { Card, Text, Button, List, ActivityIndicator, Snackbar, Divider } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { fetchPolicy } from "./policy.queries";
 import { fetchPaymentsByPolicy, markPaymentAsPaid } from "@/features/payments/payment.queries";
 import { PolicyWithDetails } from "./policy.types";
 import { Payment } from "@/features/payments/payment.types";
+
+type Nav = NavigationProp<Record<string, object | undefined>>;
+type DetRoute = RouteProp<Record<string, { id: string }>>;
 
 export default function PolicyDetailScreen() {
   const [policy, setPolicy] = useState<PolicyWithDetails | null>(null);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigation = useNavigation<any>();
-  const route = useRoute();
-  const { id } = route.params as { id: string };
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<DetRoute>();
+  const { id } = route.params;
 
   useFocusEffect(
     useCallback(() => {
@@ -75,7 +78,7 @@ export default function PolicyDetailScreen() {
             key={p.id}
             title={`$${p.amount} — ${p.payment_date}`}
             description={p.status === "paid" ? "Paid" : "Pending"}
-            right={(props) =>
+            right={() =>
               p.status === "pending" ? (
                 <Button mode="text" onPress={() => handleMarkPaid(p.id)}>Mark Paid</Button>
               ) : null

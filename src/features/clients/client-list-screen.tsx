@@ -2,16 +2,18 @@ import { useState, useCallback } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { Searchbar, List, FAB, Text, ActivityIndicator, Snackbar } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { fetchClients } from "./client.queries";
 import { Client } from "./client.types";
+
+type Nav = NavigationProp<Record<string, object | undefined>>;
 
 export default function ClientListScreen() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<Nav>();
 
   useFocusEffect(
     useCallback(() => {

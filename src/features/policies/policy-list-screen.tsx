@@ -2,9 +2,11 @@ import { useState, useCallback } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { Card, Text, Chip, FAB, ActivityIndicator, Snackbar } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { fetchPolicies } from "./policy.queries";
 import { PolicyWithDetails } from "./policy.types";
+
+type Nav = NavigationProp<Record<string, object | undefined>>;
 
 const STATUSES = ["all", "active", "expired", "cancelled"];
 
@@ -13,7 +15,7 @@ export default function PolicyListScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
-  const navigation = useNavigation<any>();
+  const navigation = useNavigation<Nav>();
 
   useFocusEffect(
     useCallback(() => {

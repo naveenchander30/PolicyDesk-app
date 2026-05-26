@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import { TextInput, Button, Text, Snackbar } from "react-native-paper";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { ScrollView, StyleSheet } from "react-native";
+import { TextInput, Button, Snackbar } from "react-native-paper";
+import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { createClient, updateClient, fetchClient } from "./client.queries";
+
+type Nav = NavigationProp<Record<string, { id?: string }>>;
+type FormRoute = RouteProp<Record<string, { id?: string }>>;
 
 export default function ClientFormScreen() {
   const [name, setName] = useState("");
@@ -11,9 +14,9 @@ export default function ClientFormScreen() {
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const navigation = useNavigation<any>();
-  const route = useRoute();
-  const editId = (route.params as { id?: string })?.id;
+  const navigation = useNavigation<Nav>();
+  const route = useRoute<FormRoute>();
+  const editId = route.params?.id;
   const isEdit = !!editId;
 
   useEffect(() => {

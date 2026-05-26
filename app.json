@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "PolicyDesk",
+    "slug": "policydesk",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "android": {
+      "package": "com.policydesk.app"
+    }
+  }
+}

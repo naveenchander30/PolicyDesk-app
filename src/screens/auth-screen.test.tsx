@@ -1,6 +1,15 @@
 import { fireEvent, render, screen } from "@testing-library/react-native";
 import { AuthScreen } from "./auth-screen";
 
+jest.mock("@/lib/supabase", () => ({
+  createSupabaseClient: () => ({
+    auth: {
+      signInWithPassword: jest.fn().mockResolvedValue({ error: null }),
+      signUp: jest.fn().mockResolvedValue({ error: null }),
+    },
+  }),
+}));
+
 describe("AuthScreen", () => {
   it("renders login controls", () => {
     render(<AuthScreen mode="login" />);

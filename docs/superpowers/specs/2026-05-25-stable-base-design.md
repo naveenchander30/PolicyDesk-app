@@ -57,12 +57,24 @@ secrets such as WhatsApp Cloud API tokens.
 ## Data Contract
 
 The first implementation will document, but not yet migrate, the high-level
-tables from the PRD:
+tables from the PRD and the agent's current Excel-style records.
 
-- `clients`
-- `insurance_types`
-- `policies`
-- `payments`
+- `clients`: client name, phone number, optional email, optional notes.
+- `insurance_types`: agent-defined categories such as vehicle, life, health,
+  and other insurance lines.
+- `policies`: linked client, linked insurance type, policy number, signing date,
+  expiry date, premium amount, payment frequency, due date, and active/inactive
+  status.
+- `payments`: linked policy, amount due, amount paid, paid date, due date, and
+  paid/pending/overdue status.
+
+Policy number, signing date, and expiry date belong to `policies`, not
+`clients`, because one client can hold multiple policies.
+
+If the source Excel sheet contains extra fields that are not yet modeled, the
+Phase 2 import/manual-entry design should either map them to `notes` or defer
+them until the exact column list is available. The stable base should not add a
+generic custom-field system yet.
 
 The eventual Phase 3 WhatsApp work will add reminder logging. The design should
 leave room for a future `reminder_logs` table linked to payment records.

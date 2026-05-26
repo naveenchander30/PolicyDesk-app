@@ -17,6 +17,7 @@ export default function PolicyFormScreen() {
   const [premium, setPremium] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [status, setStatus] = useState<"active" | "expired" | "cancelled">("active");
   const [notes, setNotes] = useState("");
   const [clients, setClients] = useState<Client[]>([]);
   const [insuranceTypes, setInsuranceTypes] = useState<InsuranceType[]>([]);
@@ -46,6 +47,7 @@ export default function PolicyFormScreen() {
       setPremium(String(policy.premium));
       setStartDate(policy.start_date);
       setEndDate(policy.end_date || "");
+      setStatus(policy.status);
       setNotes(policy.notes || "");
     }
   }
@@ -64,6 +66,7 @@ export default function PolicyFormScreen() {
         premium: parseFloat(premium),
         start_date: startDate,
         end_date: endDate || undefined,
+        status,
         notes: notes.trim() || undefined,
       };
       if (isEdit) {

@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
-import { Card, Text, ActivityIndicator, useTheme } from "react-native-paper";
+import { Card, Text, Button, ActivityIndicator, useTheme } from "react-native-paper";
+import { createSupabaseClient } from "@/lib/supabase";
 import { useDashboardStats } from "./use-dashboard-stats";
+
+const supabase = createSupabaseClient();
 
 export default function DashboardScreen() {
   const { totalClients, totalPolicies, pendingPayments, paidThisMonth, loading, refetch } = useDashboardStats();
@@ -13,6 +16,10 @@ export default function DashboardScreen() {
 
   if (loading) {
     return <ActivityIndicator />;
+  }
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
   }
 
   const cards = [
@@ -35,6 +42,9 @@ export default function DashboardScreen() {
           </Card>
         ))}
       </View>
+      <Button mode="outlined" onPress={handleSignOut} style={styles.signOut} textColor="#F44336">
+        Sign Out
+      </Button>
     </ScrollView>
   );
 }
@@ -44,4 +54,5 @@ const styles = StyleSheet.create({
   title: { marginBottom: 16, fontWeight: "800" },
   grid: { gap: 12 },
   card: { borderLeftWidth: 4 },
+  signOut: { marginTop: 32, borderColor: "#F44336" },
 });

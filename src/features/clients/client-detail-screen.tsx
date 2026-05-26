@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { ScrollView, StyleSheet } from "react-native";
-import { Card, Text, Button, List, ActivityIndicator } from "react-native-paper";
+import { Card, Text, Button, List, ActivityIndicator, Snackbar } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { fetchClient } from "./client.queries";
@@ -15,6 +15,7 @@ export default function ClientDetailScreen() {
   const [client, setClient] = useState<Client | null>(null);
   const [policies, setPolicies] = useState<PolicyWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<Nav>();
   const route = useRoute<ClientRoute>();
   const { id } = route.params;
@@ -32,7 +33,7 @@ export default function ClientDetailScreen() {
       setClient(clientData);
       setPolicies(allPolicies.filter((p) => p.client_id === id));
     } catch (e) {
-      console.error(e);
+      setError((e as Error).message);
     } finally {
       setLoading(false);
     }
@@ -66,6 +67,7 @@ export default function ClientDetailScreen() {
           />
         ))
       )}
+      <Snackbar visible={!!error} onDismiss={() => setError(null)}>{error}</Snackbar>
     </ScrollView>
   );
 }

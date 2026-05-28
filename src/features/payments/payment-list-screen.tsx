@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { View, FlatList, StyleSheet } from "react-native";
-import { Card, Text, Chip, Button, FAB, ActivityIndicator, Snackbar } from "react-native-paper";
+import { Card, Text, Chip, Button, FAB, ActivityIndicator, Snackbar, useTheme } from "react-native-paper";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { fetchPayments, markPaymentAsPaid } from "./payment.queries";
@@ -16,6 +16,7 @@ export default function PaymentListScreen() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
   const navigation = useNavigation<Nav>();
+  const theme = useTheme();
 
   useFocusEffect(
     useCallback(() => {
@@ -49,7 +50,7 @@ export default function PaymentListScreen() {
   if (loading) return <ActivityIndicator />;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.filters}>
         {FILTERS.map((f) => (
           <Chip key={f} selected={filter === f} onPress={() => setFilter(f)}>
@@ -58,34 +59,34 @@ export default function PaymentListScreen() {
         ))}
       </View>
       {filtered.length === 0 ? (
-        <Text style={styles.empty}>No payments found</Text>
+        <Text style={[styles.empty, { color: theme.colors.onSurfaceVariant }]}>No payments found</Text>
       ) : (
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <Card style={styles.card}>
+            <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
               <Card.Content>
-                <Text variant="titleMedium">${item.amount}</Text>
-                <Text variant="bodyMedium">{item.payment_date}</Text>
+                <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>${item.amount}</Text>
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{item.payment_date}</Text>
                 <Chip
                   icon={item.status === "paid" ? "check-circle" : "clock-outline"}
-                  style={item.status === "paid" ? styles.paid : styles.pending}
+                  style={{ backgroundColor: item.status === "paid" ? "#1b5e20" : "#e65100" }}
                 >
                   {item.status}
                 </Chip>
               </Card.Content>
               {item.status === "pending" ? (
                 <Card.Actions>
-                  <Button onPress={() => handleMarkPaid(item.id)}>Mark Paid</Button>
+                  <Button textColor={theme.colors.primary} onPress={() => handleMarkPaid(item.id)}>Mark Paid</Button>
                 </Card.Actions>
               ) : null}
             </Card>
           )}
         />
       )}
-      <FAB icon="plus" style={styles.fab} onPress={() => navigation.navigate("PaymentCreate")} />
-      <Snackbar visible={!!error} onDismiss={() => setError(null)}>{error}</Snackbar>
+      <FAB icon="plus" style={[styles.fab, { backgroundColor: theme.colors.primary }]} color={theme.colors.onPrimary} onPress={() => navigation.navigate("PaymentCreate")} />
+      <Snackbar visible={!!error} onDismiss={() => setError(null)} style={{ backgroundColor: theme.colors.surface }}>{error}</Snackbar>
     </View>
   );
 }
@@ -94,8 +95,6 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   filters: { flexDirection: "row", padding: 8, gap: 8 },
   card: { margin: 8 },
-  paid: { backgroundColor: "#E8F5E9" },
-  pending: { backgroundColor: "#FFF3E0" },
   empty: { textAlign: "center", marginTop: 40 },
   fab: { position: "absolute", right: 16, bottom: 16 },
 });

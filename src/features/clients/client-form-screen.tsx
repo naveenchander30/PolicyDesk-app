@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ScrollView, StyleSheet } from "react-native";
-import { TextInput, Button, Snackbar } from "react-native-paper";
+import { TextInput, Button, Snackbar, useTheme } from "react-native-paper";
 import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { createClient, updateClient, fetchClient } from "./client.queries";
 
@@ -16,6 +16,7 @@ export default function ClientFormScreen() {
   const [error, setError] = useState<string | null>(null);
   const navigation = useNavigation<Nav>();
   const route = useRoute<FormRoute>();
+  const theme = useTheme();
   const editId = route.params?.id;
   const isEdit = !!editId;
 
@@ -52,7 +53,7 @@ export default function ClientFormScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <TextInput label="Name *" value={name} onChangeText={setName} mode="outlined" style={styles.input} />
       <TextInput label="Email" value={email} onChangeText={setEmail} mode="outlined" keyboardType="email-address" style={styles.input} />
       <TextInput label="Phone" value={phone} onChangeText={setPhone} mode="outlined" keyboardType="phone-pad" style={styles.input} />
@@ -60,7 +61,7 @@ export default function ClientFormScreen() {
       <Button mode="contained" onPress={handleSubmit} loading={submitting} disabled={submitting}>
         {isEdit ? "Update" : "Create"}
       </Button>
-      <Snackbar visible={!!error} onDismiss={() => setError(null)}>{error}</Snackbar>
+      <Snackbar visible={!!error} onDismiss={() => setError(null)} style={{ backgroundColor: theme.colors.surface }}>{error}</Snackbar>
     </ScrollView>
   );
 }

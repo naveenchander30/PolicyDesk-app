@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ScrollView, StyleSheet } from "react-native";
-import { TextInput, Button, Text, Snackbar, Menu } from "react-native-paper";
+import { TextInput, Button, Text, Snackbar, Menu, useTheme } from "react-native-paper";
 import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { createPolicy, updatePolicy, fetchPolicy } from "./policy.queries";
 import { fetchClients } from "@/features/clients/client.queries";
@@ -27,6 +27,7 @@ export default function PolicyFormScreen() {
   const [showTypeMenu, setShowTypeMenu] = useState(false);
   const navigation = useNavigation<Nav>();
   const route = useRoute<PolRoute>();
+  const theme = useTheme();
   const editId = route.params?.id;
   const prefillClientId = route.params?.clientId;
   const isEdit = !!editId;
@@ -83,16 +84,16 @@ export default function PolicyFormScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text variant="titleMedium" style={styles.label}>Client</Text>
-      <Menu visible={showClientMenu} onDismiss={() => setShowClientMenu(false)} anchor={<Button mode="outlined" onPress={() => setShowClientMenu(true)}>{clients.find((c) => c.id === clientId)?.name || "Select Client"}</Button>}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text variant="titleMedium" style={[styles.label, { color: theme.colors.onSurface }]}>Client</Text>
+      <Menu visible={showClientMenu} onDismiss={() => setShowClientMenu(false)} anchor={<Button mode="outlined" onPress={() => setShowClientMenu(true)} textColor={theme.colors.primary}>{clients.find((c) => c.id === clientId)?.name || "Select Client"}</Button>}>
         {clients.map((c) => (
           <Menu.Item key={c.id} title={c.name} onPress={() => { setClientId(c.id); setShowClientMenu(false); }} />
         ))}
       </Menu>
 
-      <Text variant="titleMedium" style={styles.label}>Insurance Type</Text>
-      <Menu visible={showTypeMenu} onDismiss={() => setShowTypeMenu(false)} anchor={<Button mode="outlined" onPress={() => setShowTypeMenu(true)}>{insuranceTypes.find((t) => t.id === insuranceTypeId)?.name || "Select Type"}</Button>}>
+      <Text variant="titleMedium" style={[styles.label, { color: theme.colors.onSurface }]}>Insurance Type</Text>
+      <Menu visible={showTypeMenu} onDismiss={() => setShowTypeMenu(false)} anchor={<Button mode="outlined" onPress={() => setShowTypeMenu(true)} textColor={theme.colors.primary}>{insuranceTypes.find((t) => t.id === insuranceTypeId)?.name || "Select Type"}</Button>}>
         {insuranceTypes.map((t) => (
           <Menu.Item key={t.id} title={t.name} onPress={() => { setInsuranceTypeId(t.id); setShowTypeMenu(false); }} />
         ))}
@@ -105,7 +106,7 @@ export default function PolicyFormScreen() {
       <Button mode="contained" onPress={handleSubmit} loading={submitting} disabled={submitting}>
         {isEdit ? "Update" : "Create"}
       </Button>
-      <Snackbar visible={!!error} onDismiss={() => setError(null)}>{error}</Snackbar>
+      <Snackbar visible={!!error} onDismiss={() => setError(null)} style={{ backgroundColor: theme.colors.surface }}>{error}</Snackbar>
     </ScrollView>
   );
 }

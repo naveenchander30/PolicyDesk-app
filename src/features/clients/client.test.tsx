@@ -1,5 +1,7 @@
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, screen, waitFor } from "@testing-library/react-native";
 import ClientFormScreen from "./client-form-screen";
+
+const mockGoBack = jest.fn();
 
 jest.mock("@/lib/supabase", () => ({
   createSupabaseClient: () => ({
@@ -30,7 +32,7 @@ jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
   return {
     ...actual,
-    useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
+    useNavigation: () => ({ navigate: jest.fn(), goBack: mockGoBack }),
     useRoute: () => ({ params: {} }),
     useFocusEffect: jest.fn(),
   };
@@ -42,9 +44,23 @@ jest.mock("react-native-safe-area-context", () => ({
 }));
 
 describe("ClientFormScreen", () => {
+  beforeEach(() => {
+    mockGoBack.mockClear();
+  });
+
   it("shows validation error when name is empty", () => {
-    const { getByText, queryByText } = render(<ClientFormScreen />);
-    fireEvent.press(getByText(/create/i));
-    expect(queryByText(/name is required/i)).toBeTruthy();
+    render(<ClientFormScreen />);
+    fireEvent.press(screen.getByText(/create/i));
+    expect(screen.queryByText(/name is required/i)).toBeTruthy();
+  });
+
+  it("creates a client and navigates back", async () => {
+    render(<ClientFormScreen />);
+    const inputs = screen.getAllByTestId("text-input-outlined");
+    fireEvent.changeText(inputs[0], "Jane Doe");
+    fireEvent.changeText(inputs[1], "jane@example.com");
+    fireEvent.changeText(inputs[2], "+1 555-0000");
+    fireEvent.press(screen.getByText(/create/i));
+    await waitFor(() => expect(mockGoBack).toHaveBeenCalled());
   });
 });

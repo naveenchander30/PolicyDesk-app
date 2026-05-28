@@ -7,36 +7,18 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTheme } from "react-native-paper";
 import { createSupabaseClient } from "@/lib/supabase";
 
 const supabase = createSupabaseClient();
-
-type AuthMode = "login" | "signup";
-
-type AuthScreenProps = {
-  mode?: AuthMode;
-};
 
 type ValidationErrors = {
   email?: string;
   password?: string;
 };
 
-const copy = {
-  login: {
-    title: "Log in",
-    description: "Access your client book and payment dashboard.",
-    submit: "Log in",
-  },
-  signup: {
-    title: "Create account",
-    description: "Set up access for your PolicyDesk workspace.",
-    submit: "Create account",
-  },
-} satisfies Record<AuthMode, Record<string, string>>;
-
-export function AuthScreen({ mode = "login" }: AuthScreenProps) {
-  const content = copy[mode];
+export function AuthScreen() {
+  const theme = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<ValidationErrors>({});
@@ -59,10 +41,7 @@ export function AuthScreen({ mode = "login" }: AuthScreenProps) {
 
     setSubmitting(true);
     try {
-      const { error } =
-        mode === "login"
-          ? await supabase.auth.signInWithPassword({ email, password })
-          : await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
         Alert.alert("Error", error.message);
@@ -75,45 +54,47 @@ export function AuthScreen({ mode = "login" }: AuthScreenProps) {
   }
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.panel}>
-        <Text style={styles.eyebrow}>PolicyDesk</Text>
-        <Text accessibilityRole="header" style={styles.title}>
-          {content.title}
+    <View style={[styles.screen, { backgroundColor: theme.colors.background }]}>
+      <View style={[styles.panel, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outlineVariant }]}>
+        <Text style={[styles.eyebrow, { color: theme.colors.primary }]}>PolicyDesk</Text>
+        <Text accessibilityRole="header" style={[styles.title, { color: theme.colors.onSurface }]}>
+          Log in
         </Text>
-        <Text style={styles.body}>{content.description}</Text>
+        <Text style={[styles.body, { color: theme.colors.onSurfaceVariant }]}>Access your client book and payment dashboard.</Text>
 
-        <Text style={styles.label}>Email</Text>
+        <Text style={[styles.label, { color: theme.colors.onSurface }]}>Email</Text>
         <TextInput
           accessibilityLabel="Email"
           autoCapitalize="none"
           inputMode="email"
           onChangeText={setEmail}
-          style={styles.input}
+          style={[styles.input, { borderColor: theme.colors.outlineVariant, color: theme.colors.onSurface, backgroundColor: theme.colors.elevation.level0 }]}
           value={email}
+          placeholderTextColor={theme.colors.outline}
         />
-        {errors.email ? <Text style={styles.error}>{errors.email}</Text> : null}
+        {errors.email ? <Text style={[styles.error, { color: theme.colors.error }]}>{errors.email}</Text> : null}
 
-        <Text style={styles.label}>Password</Text>
+        <Text style={[styles.label, { color: theme.colors.onSurface }]}>Password</Text>
         <TextInput
           accessibilityLabel="Password"
           onChangeText={setPassword}
           secureTextEntry
-          style={styles.input}
+          style={[styles.input, { borderColor: theme.colors.outlineVariant, color: theme.colors.onSurface, backgroundColor: theme.colors.elevation.level0 }]}
           value={password}
+          placeholderTextColor={theme.colors.outline}
         />
         {errors.password ? (
-          <Text style={styles.error}>{errors.password}</Text>
+          <Text style={[styles.error, { color: theme.colors.error }]}>{errors.password}</Text>
         ) : null}
 
         <Pressable
           accessibilityRole="button"
           onPress={handleSubmit}
           disabled={submitting}
-          style={[styles.button, submitting && styles.buttonDisabled]}
+          style={[styles.button, { backgroundColor: theme.colors.primary }, submitting && styles.buttonDisabled]}
         >
-          <Text style={styles.buttonText}>
-            {submitting ? "Please wait…" : content.submit}
+          <Text style={[styles.buttonText, { color: theme.colors.onPrimary }]}>
+            {submitting ? "Please wait…" : "Log in"}
           </Text>
         </Pressable>
       </View>
@@ -125,47 +106,39 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "#f6f7f9",
     padding: 20,
   },
   panel: {
     gap: 12,
-    borderColor: "#d9dee7",
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
-    backgroundColor: "#ffffff",
-    padding: 20,
+    padding: 28,
   },
   eyebrow: {
-    color: "#0f766e",
     fontSize: 12,
     fontWeight: "800",
     textTransform: "uppercase",
   },
   title: {
-    color: "#17202a",
     fontSize: 28,
-    fontWeight: "800",
+    fontWeight: "700",
   },
   body: {
-    color: "#667085",
     fontSize: 15,
     lineHeight: 22,
   },
   label: {
-    color: "#17202a",
     fontSize: 14,
     fontWeight: "700",
   },
   input: {
     minHeight: 44,
-    borderColor: "#d9dee7",
     borderRadius: 8,
     borderWidth: 1,
     paddingHorizontal: 12,
+    fontSize: 15,
   },
   error: {
-    color: "#b42318",
     fontSize: 13,
   },
   button: {
@@ -173,14 +146,13 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: "center",
     borderRadius: 8,
-    backgroundColor: "#0f766e",
     paddingHorizontal: 16,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: "#ffffff",
-    fontWeight: "800",
+    fontWeight: "700",
+    fontSize: 15,
   },
 });

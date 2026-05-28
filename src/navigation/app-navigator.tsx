@@ -1,3 +1,4 @@
+import { useTheme } from "react-native-paper";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
@@ -19,16 +20,18 @@ const PoliciesStack = createNativeStackNavigator();
 const PaymentsStack = createNativeStackNavigator();
 
 function DashboardStackScreen() {
+  const theme = useTheme();
   return (
-    <DashboardStack.Navigator>
+    <DashboardStack.Navigator screenOptions={{ contentStyle: { backgroundColor: theme.colors.background }, headerStyle: { backgroundColor: theme.colors.surface }, headerTitleStyle: { color: theme.colors.onSurface }, headerTintColor: theme.colors.primary }}>
       <DashboardStack.Screen name="DashboardHome" component={DashboardScreen} options={{ title: "Dashboard" }} />
     </DashboardStack.Navigator>
   );
 }
 
 function ClientsStackScreen() {
+  const theme = useTheme();
   return (
-    <ClientsStack.Navigator>
+    <ClientsStack.Navigator screenOptions={{ contentStyle: { backgroundColor: theme.colors.background }, headerStyle: { backgroundColor: theme.colors.surface }, headerTitleStyle: { color: theme.colors.onSurface }, headerTintColor: theme.colors.primary }}>
       <ClientsStack.Screen name="ClientList" component={ClientListScreen} options={{ title: "Clients" }} />
       <ClientsStack.Screen name="ClientDetail" component={ClientDetailScreen} options={{ title: "Client" }} />
       <ClientsStack.Screen name="ClientCreate" component={ClientFormScreen} options={{ title: "New Client" }} />
@@ -38,8 +41,9 @@ function ClientsStackScreen() {
 }
 
 function PoliciesStackScreen() {
+  const theme = useTheme();
   return (
-    <PoliciesStack.Navigator>
+    <PoliciesStack.Navigator screenOptions={{ contentStyle: { backgroundColor: theme.colors.background }, headerStyle: { backgroundColor: theme.colors.surface }, headerTitleStyle: { color: theme.colors.onSurface }, headerTintColor: theme.colors.primary }}>
       <PoliciesStack.Screen name="PolicyList" component={PolicyListScreen} options={{ title: "Policies" }} />
       <PoliciesStack.Screen name="PolicyDetail" component={PolicyDetailScreen} options={{ title: "Policy" }} />
       <PoliciesStack.Screen name="PolicyCreate" component={PolicyFormScreen} options={{ title: "New Policy" }} />
@@ -49,8 +53,9 @@ function PoliciesStackScreen() {
 }
 
 function PaymentsStackScreen() {
+  const theme = useTheme();
   return (
-    <PaymentsStack.Navigator>
+    <PaymentsStack.Navigator screenOptions={{ contentStyle: { backgroundColor: theme.colors.background }, headerStyle: { backgroundColor: theme.colors.surface }, headerTitleStyle: { color: theme.colors.onSurface }, headerTintColor: theme.colors.primary }}>
       <PaymentsStack.Screen name="PaymentList" component={PaymentListScreen} options={{ title: "Payments" }} />
       <PaymentsStack.Screen name="PaymentCreate" component={PaymentFormScreen} options={{ title: "New Payment" }} />
     </PaymentsStack.Navigator>
@@ -58,6 +63,7 @@ function PaymentsStackScreen() {
 }
 
 export default function AppNavigator() {
+  const theme = useTheme();
   return (
     <NavigationContainer>
       <Tab.Navigator
@@ -72,6 +78,9 @@ export default function AppNavigator() {
             return <MaterialCommunityIcons name={icons[route.name] as keyof typeof MaterialCommunityIcons.glyphMap} size={size} color={color} />;
           },
           headerShown: false,
+          tabBarStyle: { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.outlineVariant },
+          tabBarActiveTintColor: theme.colors.primary,
+          tabBarInactiveTintColor: theme.colors.outline,
         })}
       >
         <Tab.Screen name="Dashboard" component={DashboardStackScreen} />

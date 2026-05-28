@@ -1,5 +1,7 @@
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, screen } from "@testing-library/react-native";
 import PolicyFormScreen from "./policy-form-screen";
+
+const mockGoBack = jest.fn();
 
 jest.mock("@/lib/supabase", () => ({
   createSupabaseClient: () => ({
@@ -30,7 +32,7 @@ jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
   return {
     ...actual,
-    useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
+    useNavigation: () => ({ navigate: jest.fn(), goBack: mockGoBack }),
     useRoute: () => ({ params: {} }),
     useFocusEffect: jest.fn(),
   };
@@ -50,9 +52,13 @@ jest.mock("react-native-safe-area-context", () => ({
 }));
 
 describe("PolicyFormScreen", () => {
+  beforeEach(() => {
+    mockGoBack.mockClear();
+  });
+
   it("shows validation error when required fields missing", () => {
-    const { getByText, queryByText } = render(<PolicyFormScreen />);
-    fireEvent.press(getByText(/create/i));
-    expect(queryByText(/required/i)).toBeTruthy();
+    render(<PolicyFormScreen />);
+    fireEvent.press(screen.getByText(/create/i));
+    expect(screen.queryByText(/required/i)).toBeTruthy();
   });
 });

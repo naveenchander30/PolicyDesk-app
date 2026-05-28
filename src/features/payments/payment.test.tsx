@@ -1,5 +1,7 @@
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, screen } from "@testing-library/react-native";
 import PaymentFormScreen from "./payment-form-screen";
+
+const mockGoBack = jest.fn();
 
 jest.mock("@/lib/supabase", () => ({
   createSupabaseClient: () => ({
@@ -30,7 +32,7 @@ jest.mock("@react-navigation/native", () => {
   const actual = jest.requireActual("@react-navigation/native");
   return {
     ...actual,
-    useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
+    useNavigation: () => ({ navigate: jest.fn(), goBack: mockGoBack }),
     useRoute: () => ({ params: {} }),
     useFocusEffect: jest.fn(),
   };
@@ -46,9 +48,13 @@ jest.mock("react-native-safe-area-context", () => ({
 }));
 
 describe("PaymentFormScreen", () => {
+  beforeEach(() => {
+    mockGoBack.mockClear();
+  });
+
   it("shows validation error when amount is empty", () => {
-    const { getByText, queryByText } = render(<PaymentFormScreen />);
-    fireEvent.press(getByText(/create payment/i));
-    expect(queryByText(/required/i)).toBeTruthy();
+    render(<PaymentFormScreen />);
+    fireEvent.press(screen.getByText(/create payment/i));
+    expect(screen.queryByText(/required/i)).toBeTruthy();
   });
 });

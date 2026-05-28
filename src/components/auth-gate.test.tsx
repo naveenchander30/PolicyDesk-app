@@ -20,7 +20,6 @@ jest.mock("@/navigation/app-navigator", () => ({
 describe("AuthGate", () => {
   it("renders auth when signed out", async () => {
     render(<AuthGate />);
-
     await waitFor(() => {
       expect(screen.getByRole("header", { name: "Log in" })).toBeTruthy();
     });

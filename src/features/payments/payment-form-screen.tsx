@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
-import { TextInput, Button, Text, Switch, Snackbar, Menu } from "react-native-paper";
+import { TextInput, Button, Text, Switch, Snackbar, Menu, useTheme } from "react-native-paper";
 import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { createPayment } from "./payment.queries";
 import { fetchPolicies } from "@/features/policies/policy.queries";
@@ -21,6 +21,7 @@ export default function PaymentFormScreen() {
   const [showPolicyMenu, setShowPolicyMenu] = useState(false);
   const navigation = useNavigation<Nav>();
   const route = useRoute<PayRoute>();
+  const theme = useTheme();
   const prefillPolicyId = route.params?.policyId;
 
   useEffect(() => {
@@ -52,9 +53,9 @@ export default function PaymentFormScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text variant="titleMedium" style={styles.label}>Policy</Text>
-      <Menu visible={showPolicyMenu} onDismiss={() => setShowPolicyMenu(false)} anchor={<Button mode="outlined" onPress={() => setShowPolicyMenu(true)}>{policies.find((p) => p.id === policyId)?.clients?.name || "Select Policy"}</Button>}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text variant="titleMedium" style={[styles.label, { color: theme.colors.onSurface }]}>Policy</Text>
+      <Menu visible={showPolicyMenu} onDismiss={() => setShowPolicyMenu(false)} anchor={<Button mode="outlined" onPress={() => setShowPolicyMenu(true)} textColor={theme.colors.primary}>{policies.find((p) => p.id === policyId)?.clients?.name || "Select Policy"}</Button>}>
         {policies.map((p) => (
           <Menu.Item key={p.id} title={`${p.clients?.name || "Unknown"} — $${p.premium}`} onPress={() => { setPolicyId(p.id); setShowPolicyMenu(false); }} />
         ))}
@@ -63,14 +64,14 @@ export default function PaymentFormScreen() {
       <TextInput label="Amount *" value={amount} onChangeText={setAmount} mode="outlined" keyboardType="decimal-pad" style={styles.input} />
       <TextInput label="Date (YYYY-MM-DD)" value={paymentDate} onChangeText={setPaymentDate} mode="outlined" style={styles.input} placeholder="2024-01-15" />
       <View style={styles.switchRow}>
-        <Text>Mark as paid</Text>
+        <Text style={{ color: theme.colors.onSurface }}>Mark as paid</Text>
         <Switch value={markPaid} onValueChange={setMarkPaid} />
       </View>
       <TextInput label="Notes" value={notes} onChangeText={setNotes} mode="outlined" multiline style={styles.input} />
       <Button mode="contained" onPress={handleSubmit} loading={submitting} disabled={submitting}>
         Create Payment
       </Button>
-      <Snackbar visible={!!error} onDismiss={() => setError(null)}>{error}</Snackbar>
+      <Snackbar visible={!!error} onDismiss={() => setError(null)} style={{ backgroundColor: theme.colors.surface }}>{error}</Snackbar>
     </ScrollView>
   );
 }

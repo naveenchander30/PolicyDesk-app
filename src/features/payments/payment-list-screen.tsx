@@ -86,8 +86,8 @@ export default function PaymentListScreen() {
           renderItem={({ item }) => (
             <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
               <Card.Content>
-                <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>${item.amount}</Text>
-                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{item.payment_date}</Text>
+                <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>${item.amount_due}</Text>
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{item.paid_on || item.due_date || ""}</Text>
                 <Chip
                   icon={item.status === "paid" ? "check-circle" : "clock-outline"}
                   style={{ backgroundColor: item.status === "paid" ? "#1b5e20" : "#e65100" }}

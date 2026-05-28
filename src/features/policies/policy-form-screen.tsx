@@ -15,19 +15,18 @@ type PolRoute = RouteProp<Record<string, { id?: string; clientId?: string }>>;
 export default function PolicyFormScreen() {
   const [clientId, setClientId] = useState("");
   const [insuranceTypeId, setInsuranceTypeId] = useState("");
-  const [premium, setPremium] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState<"active" | "expired" | "cancelled">("active");
-  const [notes, setNotes] = useState("");
+  const [premiumAmount, setPremiumAmount] = useState("");
+  const [signedOn, setSignedOn] = useState("");
+  const [expiresOn, setExpiresOn] = useState("");
+  const [status, setStatus] = useState<"active" | "inactive">("active");
   const [clients, setClients] = useState<Client[]>([]);
   const [insuranceTypes, setInsuranceTypes] = useState<InsuranceType[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showClientMenu, setShowClientMenu] = useState(false);
   const [showTypeMenu, setShowTypeMenu] = useState(false);
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [showSignedPicker, setShowSignedPicker] = useState(false);
+  const [showExpiresPicker, setShowExpiresPicker] = useState(false);
   const navigation = useNavigation<Nav>();
   const route = useRoute<PolRoute>();
   const theme = useTheme();
@@ -48,17 +47,16 @@ export default function PolicyFormScreen() {
       const policy = await fetchPolicy(editId);
       setClientId(policy.client_id);
       setInsuranceTypeId(policy.insurance_type_id);
-      setPremium(String(policy.premium));
-      setStartDate(policy.start_date);
-      setEndDate(policy.end_date || "");
+      setPremiumAmount(String(policy.premium_amount));
+      setSignedOn(policy.signed_on);
+      setExpiresOn(policy.expires_on || "");
       setStatus(policy.status);
-      setNotes(policy.notes || "");
     }
   }
 
   async function handleSubmit() {
-    if (!clientId || !insuranceTypeId || !premium || !startDate) {
-      setError("Client, Insurance Type, Premium, and Start Date are required");
+    if (!clientId || !insuranceTypeId || !premiumAmount || !signedOn) {
+      setError("Client, Insurance Type, Premium, and Signed On date are required");
       return;
     }
 
@@ -67,11 +65,10 @@ export default function PolicyFormScreen() {
       const input = {
         client_id: clientId,
         insurance_type_id: insuranceTypeId,
-        premium: parseFloat(premium),
-        start_date: startDate,
-        end_date: endDate || undefined,
+        premium_amount: parseFloat(premiumAmount),
+        signed_on: signedOn,
+        expires_on: expiresOn || undefined,
         status,
-        notes: notes.trim() || undefined,
       };
       if (isEdit) {
         await updatePolicy(editId, input);
@@ -102,39 +99,38 @@ export default function PolicyFormScreen() {
         ))}
       </Menu>
 
-      <TextInput label="Premium *" value={premium} onChangeText={setPremium} mode="outlined" keyboardType="decimal-pad" style={styles.input} />
+      <TextInput label="Premium Amount *" value={premiumAmount} onChangeText={setPremiumAmount} mode="outlined" keyboardType="decimal-pad" style={styles.input} />
 
-      <TouchableOpacity onPress={() => setShowStartPicker(true)}>
-        <TextInput label="Start Date *" value={startDate} mode="outlined" style={styles.input} editable={false} />
+      <TouchableOpacity onPress={() => setShowSignedPicker(true)}>
+        <TextInput label="Signed On *" value={signedOn} mode="outlined" style={styles.input} editable={false} />
       </TouchableOpacity>
-      {showStartPicker && (
+      {showSignedPicker && (
         <DateTimePicker
-          value={startDate ? new Date(startDate) : new Date()}
+          value={signedOn ? new Date(signedOn) : new Date()}
           mode="date"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={(event, date) => {
-            setShowStartPicker(Platform.OS !== "ios");
-            if (date) setStartDate(date.toISOString().split("T")[0]);
+            setShowSignedPicker(Platform.OS !== "ios");
+            if (date) setSignedOn(date.toISOString().split("T")[0]);
           }}
         />
       )}
 
-      <TouchableOpacity onPress={() => setShowEndPicker(true)}>
-        <TextInput label="End Date" value={endDate} mode="outlined" style={styles.input} editable={false} />
+      <TouchableOpacity onPress={() => setShowExpiresPicker(true)}>
+        <TextInput label="Expires On" value={expiresOn} mode="outlined" style={styles.input} editable={false} />
       </TouchableOpacity>
-      {showEndPicker && (
+      {showExpiresPicker && (
         <DateTimePicker
-          value={endDate ? new Date(endDate) : new Date()}
+          value={expiresOn ? new Date(expiresOn) : new Date()}
           mode="date"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={(event, date) => {
-            setShowEndPicker(Platform.OS !== "ios");
-            if (date) setEndDate(date.toISOString().split("T")[0]);
+            setShowExpiresPicker(Platform.OS !== "ios");
+            if (date) setExpiresOn(date.toISOString().split("T")[0]);
           }}
         />
       )}
 
-      <TextInput label="Notes" value={notes} onChangeText={setNotes} mode="outlined" multiline style={styles.input} />
       <Button mode="contained" onPress={handleSubmit} loading={submitting} disabled={submitting}>
         {isEdit ? "Update" : "Create"}
       </Button>

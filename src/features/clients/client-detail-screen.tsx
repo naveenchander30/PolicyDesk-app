@@ -70,7 +70,7 @@ export default function ClientDetailScreen() {
         policies.map((p) => (
           <List.Item
             key={p.id}
-            title={`${p.insurance_types?.name || "Insurance"} — $${p.premium}`}
+            title={`${p.insurance_types?.name || "Insurance"} — $${p.premium_amount}`}
             titleStyle={{ color: theme.colors.onSurface }}
             description={`Status: ${p.status}`}
             descriptionStyle={{ color: theme.colors.onSurfaceVariant }}

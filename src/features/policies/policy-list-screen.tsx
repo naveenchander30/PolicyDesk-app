@@ -9,7 +9,7 @@ import { PolicyWithDetails } from "./policy.types";
 
 type Nav = NavigationProp<Record<string, object | undefined>>;
 
-const STATUSES = ["all", "active", "expired", "cancelled"];
+const STATUSES = ["all", "active", "inactive"];
 
 export default function PolicyListScreen() {
   const [policies, setPolicies] = useState<PolicyWithDetails[]>([]);
@@ -78,9 +78,9 @@ export default function PolicyListScreen() {
             <Card style={[styles.card, { backgroundColor: theme.colors.surface }]} onPress={() => navigation.navigate("PolicyDetail", { id: item.id })}>
               <Card.Content>
                 <Text variant="titleMedium" style={{ color: theme.colors.onSurface }}>{item.clients?.name || "Unknown Client"}</Text>
-                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{item.insurance_types?.name || "Unknown Type"} — ${item.premium}</Text>
+                <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>{item.insurance_types?.name || "Unknown Type"} — ${item.premium_amount}</Text>
                 <Text variant="bodySmall" style={{
-                  color: item.status === "active" ? "#81c784" : item.status === "expired" ? "#ffb74d" : "#e57373",
+                  color: item.status === "active" ? "#81c784" : "#e57373",
                 }}>
                   {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                 </Text>

@@ -58,16 +58,15 @@ export default function PolicyDetailScreen() {
         <Card.Content>
           <Text style={{ color: theme.colors.onSurfaceVariant }}>Client: {policy.clients?.name || "Unknown"}</Text>
           <Text style={{ color: theme.colors.onSurfaceVariant }}>Insurance Type: {policy.insurance_types?.name || "Unknown"}</Text>
-          <Text style={{ color: theme.colors.onSurfaceVariant }}>Premium: ${policy.premium}</Text>
-          <Text style={{ color: theme.colors.onSurfaceVariant }}>Start: {policy.start_date}</Text>
-          {policy.end_date ? <Text style={{ color: theme.colors.onSurfaceVariant }}>End: {policy.end_date}</Text> : null}
+          <Text style={{ color: theme.colors.onSurfaceVariant }}>Premium: ${policy.premium_amount}</Text>
+          <Text style={{ color: theme.colors.onSurfaceVariant }}>Signed: {policy.signed_on}</Text>
+          {policy.expires_on ? <Text style={{ color: theme.colors.onSurfaceVariant }}>Expires: {policy.expires_on}</Text> : null}
           <Text style={{
-            color: policy.status === "active" ? theme.colors.primary : policy.status === "expired" ? "#ffb74d" : "#e57373",
+            color: policy.status === "active" ? theme.colors.primary : "#e57373",
             fontWeight: "700",
           }}>
             Status: {policy.status}
           </Text>
-          {policy.notes ? <Text style={{ color: theme.colors.onSurfaceVariant }}>Notes: {policy.notes}</Text> : null}
         </Card.Content>
         <Card.Actions>
           <Button textColor={theme.colors.primary} onPress={() => navigation.navigate("PolicyEdit", { id: policy.id })}>Edit</Button>
@@ -82,7 +81,7 @@ export default function PolicyDetailScreen() {
         payments.map((p) => (
           <List.Item
             key={p.id}
-            title={`$${p.amount} — ${p.payment_date}`}
+            title={`$${p.amount_due} — ${p.paid_on || p.due_date || ""}`}
             titleStyle={{ color: theme.colors.onSurface }}
             description={p.status === "paid" ? "Paid" : "Pending"}
             descriptionStyle={{ color: theme.colors.onSurfaceVariant }}

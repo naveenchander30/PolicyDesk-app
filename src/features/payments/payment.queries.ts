@@ -4,7 +4,7 @@ import { Payment, PaymentInput } from "./payment.types";
 const supabase = createSupabaseClient();
 
 export async function fetchPayments(): Promise<Payment[]> {
-  const { data, error } = await supabase.from("payments").select("*").order("payment_date", { ascending: false });
+  const { data, error } = await supabase.from("payments").select("*").order("due_date", { ascending: false });
   if (error) throw error;
   return data ?? [];
 }
@@ -14,7 +14,7 @@ export async function fetchPaymentsByPolicy(policyId: string): Promise<Payment[]
     .from("payments")
     .select("*")
     .eq("policy_id", policyId)
-    .order("payment_date", { ascending: false });
+    .order("due_date", { ascending: false });
   if (error) throw error;
   return data ?? [];
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { TextInput, Button, Text, Snackbar, Menu, useTheme } from "react-native-paper";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { createPolicy, updatePolicy, fetchPolicy } from "./policy.queries";
 import { fetchClients } from "@/features/clients/client.queries";
@@ -25,6 +26,8 @@ export default function PolicyFormScreen() {
   const [error, setError] = useState<string | null>(null);
   const [showClientMenu, setShowClientMenu] = useState(false);
   const [showTypeMenu, setShowTypeMenu] = useState(false);
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
   const navigation = useNavigation<Nav>();
   const route = useRoute<PolRoute>();
   const theme = useTheme();
@@ -100,8 +103,37 @@ export default function PolicyFormScreen() {
       </Menu>
 
       <TextInput label="Premium *" value={premium} onChangeText={setPremium} mode="outlined" keyboardType="decimal-pad" style={styles.input} />
-      <TextInput label="Start Date (YYYY-MM-DD) *" value={startDate} onChangeText={setStartDate} mode="outlined" style={styles.input} placeholder="2024-01-15" />
-      <TextInput label="End Date (YYYY-MM-DD)" value={endDate} onChangeText={setEndDate} mode="outlined" style={styles.input} placeholder="2025-01-15" />
+
+      <TouchableOpacity onPress={() => setShowStartPicker(true)}>
+        <TextInput label="Start Date *" value={startDate} mode="outlined" style={styles.input} editable={false} />
+      </TouchableOpacity>
+      {showStartPicker && (
+        <DateTimePicker
+          value={startDate ? new Date(startDate) : new Date()}
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(event, date) => {
+            setShowStartPicker(Platform.OS !== "ios");
+            if (date) setStartDate(date.toISOString().split("T")[0]);
+          }}
+        />
+      )}
+
+      <TouchableOpacity onPress={() => setShowEndPicker(true)}>
+        <TextInput label="End Date" value={endDate} mode="outlined" style={styles.input} editable={false} />
+      </TouchableOpacity>
+      {showEndPicker && (
+        <DateTimePicker
+          value={endDate ? new Date(endDate) : new Date()}
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(event, date) => {
+            setShowEndPicker(Platform.OS !== "ios");
+            if (date) setEndDate(date.toISOString().split("T")[0]);
+          }}
+        />
+      )}
+
       <TextInput label="Notes" value={notes} onChangeText={setNotes} mode="outlined" multiline style={styles.input} />
       <Button mode="contained" onPress={handleSubmit} loading={submitting} disabled={submitting}>
         {isEdit ? "Update" : "Create"}

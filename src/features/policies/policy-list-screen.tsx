@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
-import { Card, Text, Chip, FAB, ActivityIndicator, Snackbar, useTheme } from "react-native-paper";
+import { View, FlatList, StyleSheet, RefreshControl } from "react-native";
+import { Card, Text, Chip, Button, FAB, ActivityIndicator, Snackbar, useTheme } from "react-native-paper";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { fetchPolicies } from "./policy.queries";
@@ -15,6 +16,7 @@ export default function PolicyListScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation<Nav>();
   const theme = useTheme();
 
@@ -36,6 +38,12 @@ export default function PolicyListScreen() {
     }
   }
 
+  async function onRefresh() {
+    setRefreshing(true);
+    await loadPolicies();
+    setRefreshing(false);
+  }
+
   const filtered = filter === "all" ? policies : policies.filter((p) => p.status === filter);
 
   if (loading) return <ActivityIndicator />;
@@ -50,11 +58,22 @@ export default function PolicyListScreen() {
         ))}
       </View>
       {filtered.length === 0 ? (
-        <Text style={[styles.empty, { color: theme.colors.onSurfaceVariant }]}>No policies found</Text>
+        <View style={styles.empty}>
+          <MaterialCommunityIcons name="file-document-outline" size={64} color={theme.colors.outline} />
+          <Text style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}>
+            {filter !== "all" ? "No policies match this filter" : "No policies yet"}
+          </Text>
+          {filter === "all" && (
+            <Button mode="contained" onPress={() => navigation.navigate("PolicyCreate")} style={styles.emptyBtn}>
+              Add Policy
+            </Button>
+          )}
+        </View>
       ) : (
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />}
           renderItem={({ item }) => (
             <Card style={[styles.card, { backgroundColor: theme.colors.surface }]} onPress={() => navigation.navigate("PolicyDetail", { id: item.id })}>
               <Card.Content>
@@ -81,6 +100,8 @@ const styles = StyleSheet.create({
   filters: { flexDirection: "row", padding: 8, gap: 8 },
   chip: { marginRight: 4 },
   card: { margin: 8 },
-  empty: { textAlign: "center", marginTop: 40 },
+  empty: { alignItems: "center", padding: 48 },
+  emptyText: { textAlign: "center", marginTop: 16 },
+  emptyBtn: { marginTop: 16 },
   fab: { position: "absolute", right: 16, bottom: 16 },
 });

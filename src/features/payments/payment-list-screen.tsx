@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import { View, FlatList, StyleSheet, RefreshControl } from "react-native";
 import { Card, Text, Chip, Button, FAB, ActivityIndicator, Snackbar, useTheme } from "react-native-paper";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { fetchPayments, markPaymentAsPaid } from "./payment.queries";
@@ -15,6 +16,7 @@ export default function PaymentListScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation<Nav>();
   const theme = useTheme();
 
@@ -34,6 +36,12 @@ export default function PaymentListScreen() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await loadPayments();
+    setRefreshing(false);
   }
 
   async function handleMarkPaid(id: string) {
@@ -59,11 +67,22 @@ export default function PaymentListScreen() {
         ))}
       </View>
       {filtered.length === 0 ? (
-        <Text style={[styles.empty, { color: theme.colors.onSurfaceVariant }]}>No payments found</Text>
+        <View style={styles.empty}>
+          <MaterialCommunityIcons name="credit-card-outline" size={64} color={theme.colors.outline} />
+          <Text style={[styles.emptyText, { color: theme.colors.onSurfaceVariant }]}>
+            {filter !== "all" ? "No payments match this filter" : "No payments yet"}
+          </Text>
+          {filter === "all" && (
+            <Button mode="contained" onPress={() => navigation.navigate("PaymentCreate")} style={styles.emptyBtn}>
+              Record Payment
+            </Button>
+          )}
+        </View>
       ) : (
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.colors.primary} />}
           renderItem={({ item }) => (
             <Card style={[styles.card, { backgroundColor: theme.colors.surface }]}>
               <Card.Content>
@@ -95,6 +114,8 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   filters: { flexDirection: "row", padding: 8, gap: 8 },
   card: { margin: 8 },
-  empty: { textAlign: "center", marginTop: 40 },
+  empty: { alignItems: "center", padding: 48 },
+  emptyText: { textAlign: "center", marginTop: 16 },
+  emptyBtn: { marginTop: 16 },
   fab: { position: "absolute", right: 16, bottom: 16 },
 });

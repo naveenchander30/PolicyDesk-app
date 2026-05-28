@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
+import { View, ScrollView, StyleSheet, TouchableOpacity, Platform } from "react-native";
 import { TextInput, Button, Text, Switch, Snackbar, Menu, useTheme } from "react-native-paper";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation, useRoute, NavigationProp, RouteProp } from "@react-navigation/native";
 import { createPayment } from "./payment.queries";
 import { fetchPolicies } from "@/features/policies/policy.queries";
@@ -19,6 +20,7 @@ export default function PaymentFormScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPolicyMenu, setShowPolicyMenu] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const navigation = useNavigation<Nav>();
   const route = useRoute<PayRoute>();
   const theme = useTheme();
@@ -62,7 +64,22 @@ export default function PaymentFormScreen() {
       </Menu>
 
       <TextInput label="Amount *" value={amount} onChangeText={setAmount} mode="outlined" keyboardType="decimal-pad" style={styles.input} />
-      <TextInput label="Date (YYYY-MM-DD)" value={paymentDate} onChangeText={setPaymentDate} mode="outlined" style={styles.input} placeholder="2024-01-15" />
+
+      <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+        <TextInput label="Date" value={paymentDate} mode="outlined" style={styles.input} editable={false} />
+      </TouchableOpacity>
+      {showDatePicker && (
+        <DateTimePicker
+          value={new Date(paymentDate)}
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(event, date) => {
+            setShowDatePicker(Platform.OS !== "ios");
+            if (date) setPaymentDate(date.toISOString().split("T")[0]);
+          }}
+        />
+      )}
+
       <View style={styles.switchRow}>
         <Text style={{ color: theme.colors.onSurface }}>Mark as paid</Text>
         <Switch value={markPaid} onValueChange={setMarkPaid} />
